@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Espace Kawaii - Musique & Pages</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: #fff0f3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #5a4a42;
+        }
+
+        /* Arrière-plan étiré de force (PC & Mobile) */
+        #fondContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('arriere-plan.jpeg');
+            background-size: 100% 100%;
+            background-position: center center;
+            background-repeat: no-repeat;
+            z-index: -1;
+            transition: background-image 0.5s ease-in-out;
+            filter: brightness(105%) saturate(120%);
+        }
+
+        /* --- SYSTÈME DE FLEURS QUI TOMBENT (KAWAII) --- */
+        .flower-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 50;
+        }
+
+        .falling-flower {
+            position: absolute;
+            top: -10vh;
+            font-size: 24px;
+            opacity: 0.6;
+            user-select: none;
+            animation: fallAndRotate linear infinite;
+        }
+
+        @keyframes fallAndRotate {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.6;
+            }
+            85% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(105vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* --- COMPTEUR "JE T'AIME" TOUT EN HAUT À GAUCHE --- */
+        #compteurTemps {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            z-index: 150;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px 14px;
+            border-radius: 15px;
+            border: 2px solid #ffb7c5;
+            font-weight: bold;
+            color: #d81b60;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(255, 183, 197, 0.4);
+            backdrop-filter: blur(5px);
+            user-select: none;
+        }
+
+        /* --- GROUPE DE BOUTONS EN BAS À GAUCHE --- */
+        #groupeBoutonsFond {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 150;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-fond-action {
+            background: rgba(255, 255, 255, 0.9);
+            color: #d81b60;
+            border: 2px solid #ffb7c5;
+            padding: 10px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 183, 197, 0.4);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+            touch-action: manipulation;
+        }
+
+        .btn-fond-action:hover {
+            transform: scale(1.05);
+            background-color: #ffffff;
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.6);
+        }
+
+        /* Voile de transition doux pour changer de page */
+        #ecranVoile {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #ffb7c5;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease-in-out;
+            z-index: 99;
+        }
+
+        #ecranVoile.fondu {
+            opacity: 0.85;
+        }
+
+        /* Bouton de navigation en haut à droite */
+        #btnNavigation {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #d81b60;
+            border: 2px solid #ffb7c5;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 150;
+            box-shadow: 0 4px 15px rgba(255, 183, 197, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+            touch-action: manipulation;
+        }
+
+        #btnNavigation:hover {
+            transform: scale(1.05);
+            background-color: #ffffff;
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.6);
+        }
+
+        /* --- LE LECTEUR CENTRAL RESPONSIVE (Page 2) --- */
+        #centreYoutube {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 150;
+            display: none;
+            width: 80vw;
+            max-width: 600px;
+            aspect-ratio: 16 / 9;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px;
+            border-radius: 25px;
+            border: 2px solid #ffb7c5;
+            box-shadow: 0 15px 35px rgba(255, 183, 197, 0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        .boite-mystere-centrale {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+            border: 2px dashed #ff6f91;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            gap: 12px;
+            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+            box-shadow: inset 0 2px 8px rgba(255,255,255,0.6);
+        }
+
+        .boite-mystere-centrale:hover {
+            transform: scale(1.01);
+            background: linear-gradient(135deg, #ffe4e6 0%, #ffb6c1 100%);
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
+        }
+
+        .boite-mystere-centrale .icone-mq {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .boite-mystere-centrale .texte-mq {
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            font-weight: bold;
+            color: #d81b60;
+            text-align: center;
+            padding: 0 15px;
+        }
+
+        #centreYoutube iframe {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            border: none;
+            display: block;
+        }
+
+        /* Popups communes (Page 1) */
+        .popup-centre {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            background: rgba(255, 255, 255, 0.94);
+            padding: 5vh 5vw;
+            border-radius: 25px;
+            border: 2px solid #ffb7c5;
+            box-shadow: 0 15px 35px rgba(255, 183, 197, 0.5);
+            text-align: center;
+            z-index: 150;
+            backdrop-filter: blur(8px);
+            width: 85%;
+            max-width: 420px;
+            opacity: 1;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, -40%) scale(0.85); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .popup-centre.disparition {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8) !important;
+            pointer-events: none;
+        }
+
+        .popup-centre h1 {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            color: #d81b60;
+            margin-top: 0;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .popup-centre p {
+            font-size: clamp(0.9rem, 3vw, 1.05rem);
+            color: #6d4c41;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .btn-popup {
+            background-color: #ffb7c5;
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 183, 197, 0.6);
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+            touch-action: manipulation;
+        }
+
+        .btn-popup:disabled {
+            background-color: #e0d0d4 !important;
+            color: #8c7b80 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        .btn-popup:not(:disabled):hover {
+            background-color: #ff8fa3;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 143, 163, 0.8);
+        }
+
+        #messageAmoureux {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+        const prenomUtilisateur = "Mon Trésor";
+    </script>
+
+    <!-- Éléments visuels -->
+    <div id="fondContainer"></div>
+    <div id="ecranVoile"></div>
+
+    <!-- Conteneur des fleurs qui tombent -->
+    <div class="flower-container"></div>
+
+    <!-- Compteur "Je t'aime" en haut à gauche -->
+    <div id="compteurTemps">Temps passé : <span id="texteCompteur">0 je t'aime</span> 💕</div>
+
+    <!-- Boutons en bas à gauche -->
+    <div id="groupeBoutonsFond">
+        <button class="btn-fond-action" onclick="changerProchainFond()">
+            🖼️ Changer fond
+        </button>
+        <button class="btn-fond-action" onclick="remettreFondDefaut()">
+            ↩️ Par défaut
+        </button>
+    </div>
+
+    <!-- Bouton en haut à droite pour changer de page -->
+    <button id="btnNavigation" onclick="basculerPage()">
+        <span id="iconeBouton">🎵</span> <span id="texteBouton">Musique</span>
+    </button>
+
+    <!-- Lecteur YouTube Unique et Centralisé (Visible uniquement sur la page 2) -->
+    <div id="centreYoutube">
+        <div class="boite-mystere-centrale" id="boiteCentrale" onclick="chargerLecteurCentral()">
+            <span class="icone-mq">❓</span>
+            <span class="texte-mq">Clique pour révéler la surprise musicale ✨</span>
+        </div>
+    </div>
+
+    <!-- Première Popup de Bienvenue (Page 1) -->
+    <div id="messageBienvenue" class="popup-centre">
+        <h1>Bienvenue 💕</h1>
+        <p id="texteBienvenueDynamique">Je t'apprécie. Je t'apprécie vraiment, j'ai fait cet endroit spécialement pour toi.</p>
+        <button id="btnFermerAccueil" class="btn-popup" disabled onclick="fermerBienvenueEtOuvrirAmour()">Lecture... (5s)</button>
+    </div>
+
+    <!-- Deuxième Popup Amoureuse -->
+    <div id="messageAmoureux" class="popup-centre">
+        <h1>P'tit mot doux... 💌</h1>
+        <p>Je suis tellement amoureux que je sais pas quoi faire, c'est pour ça que je me suis dit que ça serait bien de faire un site web pour toi... la vérité, je sais même pas comment te parler tellement je suis amoureux. 🌸</p>
+        <button id="btnFermerAmour" class="btn-popup" disabled onclick="fermerAmour()">Lecture... (5s)</button>
+    </div>
+
+<script>
+    let pageActuelle = 1;
+    let secondesPassees = 0;
+
+    // Fonds par défaut de chaque page
+    const fondDefautPage1 = 'arriere-plan.jpeg';
+    const fondDefautPage2 = 'arriere-plan2.jpeg';
+
+    // Mémorisation indépendante du fond actif pour chaque page (stocke soit le nom d'un fichier de la liste, soit null si c'est le défaut)
+    let fondMemoirePage1 = null;
+    let fondMemoirePage2 = null;
+
+    // Index de défilement séparé pour chaque page
+    let indexFondPage1 = 0;
+    let indexFondPage2 = 0;
+
+    let listeFondsDisponibles = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const pTag = document.getElementById("texteBienvenueDynamique");
+        pTag.innerHTML = `Coucou <strong>${prenomUtilisateur}</strong> ! Je t'apprécie. Je t'apprécie vraiment, j'ai fait cet endroit spécialement pour toi. 🌸`;
+
+        detecterFondsDisponibles();
+
+        setInterval(createFlower, 500);
+
+        setInterval(() => {
+            secondesPassees++;
+            const spanCompteur = document.getElementById("texteCompteur");
+            if (spanCompteur) {
+                spanCompteur.innerText = `${secondesPassees} je t'aime`;
+            }
+        }, 1000);
+
+        lancerDelaiLecture('btnFermerAccueil', "C'est trop mignon ! ✨");
+    });
+
+    /* Détection intelligente des fichiers fond.jpeg, fond2.jpeg, etc. */
+    function detecterFondsDisponibles() {
+        listeFondsDisponibles = [];
+        let i = 1;
+        
+        function verifierSuivant() {
+            let nomFichier = (i === 1) ? 'fond.jpeg' : `fond${i}.jpeg`;
+            let img = new Image();
+            
+            img.onload = function() {
+                listeFondsDisponibles.push(nomFichier);
+                i++;
+                verifierSuivant();
+            };
+            
+            img.onerror = function() {
+                console.log(`Détection terminée : ${listeFondsDisponibles.length} image(s) de fond trouvée(s).`);
+                // Appliquer le fond initial de la page 1 une fois la liste prête
+                mettreAJourAffichageFond();
+            };
+            
+            img.src = nomFichier;
+        }
+
+        verifierSuivant();
+    }
+
+    /* Applique visuellement le fond correspondant à la page actuelle */
+    function mettreAJourAffichageFond() {
+        const fondDiv = document.getElementById('fondContainer');
+        if (pageActuelle === 1) {
+            if (fondMemoirePage1 !== null) {
+                fondDiv.style.backgroundImage = `url('${fondMemoirePage1}')`;
+            } else {
+                fondDiv.style.backgroundImage = `url('${fondDefautPage1}')`;
+            }
+        } else {
+            if (fondMemoirePage2 !== null) {
+                fondDiv.style.backgroundImage = `url('${fondMemoirePage2}')`;
+            } else {
+                fondDiv.style.backgroundImage = `url('${fondDefautPage2}')`;
+            }
+        }
+    }
+
+    /* Changer de fond de manière cyclique pour la page active */
+    function changerProchainFond() {
+        if (listeFondsDisponibles.length === 0) {
+            alert("Aucun fichier 'fond.jpeg' détecté dans le dossier !");
+            return;
+        }
+
+        if (pageActuelle === 1) {
+            fondMemoirePage1 = listeFondsDisponibles[indexFondPage1];
+            indexFondPage1 = (indexFondPage1 + 1) % listeFondsDisponibles.length;
+        } else {
+            fondMemoirePage2 = listeFondsDisponibles[indexFondPage2];
+            indexFondPage2 = (indexFondPage2 + 1) % listeFondsDisponibles.length;
+        }
+
+        mettreAJourAffichageFond();
+    }
+
+    /* Remettre le fond par défaut uniquement pour la page active */
+    function remettreFondDefaut() {
+        if (pageActuelle === 1) {
+            fondMemoirePage1 = null;
+            indexFondPage1 = 0;
+        } else {
+            fondMemoirePage2 = null;
+            indexFondPage2 = 0;
+        }
+        mettreAJourAffichageFond();
+    }
+
+    function createFlower() {
+        const container = document.querySelector('.flower-container');
+        if (!container) return;
+
+        const flower = document.createElement('div');
+        flower.classList.add('falling-flower');
+        flower.innerHTML = '🌷';
+        flower.style.left = Math.random() * 100 + 'vw';
+        const duration = Math.random() * 6 + 7;
+        flower.style.animationDuration = duration + 's';
+        const size = Math.random() * 12 + 20;
+        flower.style.fontSize = size + 'px';
+
+        setTimeout(() => {
+            flower.remove();
+        }, duration * 1000);
+
+        container.appendChild(flower);
+    }
+
+    function lancerDelaiLecture(btnId, texteFinal) {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+
+        let secondesRestantes = 5;
+        btn.disabled = true;
+        btn.innerText = `Lecture... (${secondesRestantes}s)`;
+
+        const intervalle = setInterval(() => {
+            secondesRestantes--;
+            if (secondesRestantes > 0) {
+                btn.innerText = `Lecture... (${secondesRestantes}s)`;
+            } else {
+                clearInterval(intervalle);
+                btn.disabled = false;
+                btn.innerText = texteFinal;
+            }
+        }, 1000);
+    }
+
+    function fermerBienvenueEtOuvrirAmour() {
+        const popup1 = document.getElementById('messageBienvenue');
+        popup1.classList.add('disparition');
+
+        setTimeout(() => {
+            popup1.style.display = 'none';
+            const popup2 = document.getElementById('messageAmoureux');
+            popup2.style.display = 'block';
+            lancerDelaiLecture('btnFermerAmour', "J'ai compris ✨");
+        }, 400);
+    }
+
+    function fermerAmour() {
+        const popup2 = document.getElementById('messageAmoureux');
+        popup2.classList.add('disparition');
+
+        setTimeout(() => {
+            popup2.style.display = 'none';
+        }, 400);
+    }
+
+    function chargerLecteurCentral() {
+        const conteneur = document.getElementById('centreYoutube');
+        conteneur.innerHTML = `
+            <iframe src="https://www.youtube-nocookie.com/embed/aTK72cR-GOY?autoplay=1" 
+                    title="ATC Around the world (Miku and Luka)" 
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+            </iframe>
+        `;
+    }
+
+    function basculerPage() {
+        const voile = document.getElementById('ecranVoile');
+        const iconeBouton = document.getElementById('iconeBouton');
+        const texteBouton = document.getElementById('texteBouton');
+        const centreYoutube = document.getElementById('centreYoutube');
+
+        voile.classList.add('fondu');
+
+        setTimeout(() => {
+            if (pageActuelle === 1) {
+                pageActuelle = 2;
+                centreYoutube.style.display = 'block';
+                iconeBouton.innerText = "🌸";
+                texteBouton.innerText = "Retour";
+            } else {
+                pageActuelle = 1;
+                centreYoutube.style.display = 'none';
+                iconeBouton.innerText = "🎵";
+                texteBouton.innerText = "Musique";
+            }
+
+            // Restaure instantanément le fond mémorisé de la page où l'on arrive
+            mettreAJourAffichageFond();
+
+            voile.classList.remove('fondu');
+        }, 400);
+    }
+</script>
+
+</body>
+</html>
